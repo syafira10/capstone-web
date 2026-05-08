@@ -85,23 +85,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Role Selection */}
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-gray-700">Role</Label>
-              <div className="relative">
-                <UserCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
-                <Select value={role} onValueChange={setRole}>
-                  <SelectTrigger id="role" className="pl-11 h-12 border-gray-300">
-                    <SelectValue placeholder="Select your role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="head">Head of Station</SelectItem>
-                    <SelectItem value="field">Field Officer</SelectItem>
-                    <SelectItem value="it">IT Support</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
 
             {/* Login Button */}
             <Button 
