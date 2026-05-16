@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Flood Monitoring Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        body {
+
+            font-family: Arial;
+            background: #111827;
+            color: white;
+            text-align: center;
+            padding: 40px;
+
+            transition: 0.5s;
+        }
+
+        .card {
+
+            background: #1f2937;
+
+            padding: 20px;
+
+            margin: 20px auto;
+
+            width: 350px;
+
+            border-radius: 12px;
+        }
+
+        h1 {
+
+            color: #38bdf8;
+        }
+
+        .status {
+
+            font-size: 30px;
+
+            font-weight: bold;
+        }
+
+        #alertText {
+
+            font-size: 20px;
+
+            margin-top: 10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>🌊 Flood Monitoring Dashboard</h1>
+
+
+    <!-- =============================== -->
+    <!-- RAIN -->
+    <!-- =============================== -->
+
+    <div class="card">
+
+        <h2>Rain Intensity</h2>
+
+        <p id="rain">0</p>
+
+    </div>
+
+
+    <!-- =============================== -->
+    <!-- KRL -->
+    <!-- =============================== -->
+
+    <div class="card">
+
+        <h2>KRL Water Level</h2>
+
+        <p id="krl">0 cm</p>
+
+    </div>
+
+
+    <!-- =============================== -->
+    <!-- KAI -->
+    <!-- =============================== -->
+
+    <div class="card">
+
+        <h2>KAI Water Level</h2>
+
+        <p id="kai">0 cm</p>
+
+    </div>
+
+
+    <!-- =============================== -->
+    <!-- STATUS -->
+    <!-- =============================== -->
+
+    <div class="card">
+
+        <h2>Flood Status</h2>
+
+        <p id="status" class="status">
+
+            SAFE
+
+        </p>
+
+        <p id="alertText">
+
+            Normal Condition
+
+        </p>
+
+    </div>
+
+
+    <!-- =============================== -->
+    <!-- CHART -->
+    <!-- =============================== -->
+
+    <div class="card">
+
+        <h2>Realtime Water Level Chart</h2>
+
+        <canvas id="waterChart"></canvas>
+
+    </div>
+
+
+
+<script>
+
+
+// ======================================
+// FETCH LATEST DATA
+// ======================================
+
+async function fetchData() {
+
+    const response = await fetch(
+        '/api/latest/'
+    )
+
+    const data = await response.json()
+
+
+    document.getElementById("rain").innerHTML =
+        data.rain
+
+    document.getElementById("krl").innerHTML =
+        data.krl_cm + " cm"
+
+    document.getElementById("kai").innerHTML =
+        data.kai_cm + " cm"
+
+    document.getElementById("status").innerHTML =
+        data.status
+
+
+    // ==================================
+    // STATUS UI
+    // ==================================
+
+    const status =
+        document.getElementById("status")
+
+
+    // SAFE
+
+    if (data.status == "SAFE") {
+
+        status.style.color = "lime"
+
+        document.body.style.background =
+            "#111827"
+
+        document.getElementById(
+            "alertText"
+        ).innerHTML =
+            "Normal Condition"
+
+    }
+
+
+    // WARNING
+
+    else if (data.status == "WARNING") {
+
+        status.style.color = "yellow"
+
+        document.body.style.background =
+            "#3f3f00"
+
+        document.getElementById(
+            "alertText"
+        ).innerHTML =
+            "⚠ Water Level Rising"
+
+    }
+
+
+    // HIGH RISK
+
+    else if (data.status == "HIGH RISK") {
+
+        status.style.color = "orange"
+
+        document.body.style.background =
+            "#4a1d00"
+
+        document.getElementById(
+            "alertText"
+        ).innerHTML =
+            "🚨 HIGH FLOOD RISK"
+
+    }
+
+
+    // KRL STOP / TOTAL STOP
+
+    else {
+
+        status.style.color = "red"
+
+        document.body.style.background =
+            "#3b0000"
+
+        document.getElementById(
+            "alertText"
+        ).innerHTML =
+            "🛑 TRAIN OPERATION STOPPED"
+
+    }
+}
+
+
+
+// ======================================
+// AUTO REFRESH DATA
+// ======================================
+
+setInterval(fetchData, 2000)
+
+fetchData()
+
+
+
+// ======================================
+// CHART SETUP
+// ======================================
+
+const ctx =
+    document.getElementById(
+        'waterChart'
+    )
+
+
+const waterChart =
+    new Chart(ctx, {
+
+        type: 'line',
+
+        data: {
+
+            labels: [],
+
+            datasets: [
+
+                {
+
+                    label:
+                        'KRL Water Level',
+
+                    data: [],
+
+                    borderWidth: 2,
+                }
+            ]
+        },
+
+        options: {
+
+            responsive: true,
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true
+                }
+            }
+        }
+})
+
+
+
+// ======================================
+// FETCH HISTORY DATA
+// ======================================
+
+async function fetchHistory() {
+
+    const response = await fetch(
+        '/api/history/'
+    )
+
+    const data =
+        await response.json()
+
+
+    waterChart.data.labels = []
+
+    waterChart.data.datasets[0].data = []
+
+
+    data.reverse().forEach(item => {
+
+        waterChart.data.labels.push(
+            item.timestamp
+        )
+
+        waterChart.data.datasets[0].data.push(
+            item.krl_cm
+        )
+    })
+
+
+    waterChart.update()
+}
+
+
+
+// ======================================
+// AUTO REFRESH CHART
+// ======================================
+
+setInterval(fetchHistory, 3000)
+
+fetchHistory()
+
+
+</script>
+
+</body>
+</html>
