@@ -1,0 +1,44 @@
+# Node
+node_modules/
+.vite/
+dist/
+/build/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+venv/
+.venv/
+*/venv/
+
+# VSCode
+.vscode/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Ignore common native binaries from node modules
+node_modules/@esbuild/
+node_modules/.bin/
+
+# Ignore server/runtime
+server/
+
+# Ignore local Django DB and migrations if needed
+# (keep migration files but ignore DB)
+db.sqlite3
+
+# keep source folders (django-backend, capstone-web) included
+# but ignore their venvs and build artifacts
+capstone-web/node_modules/
+capstone-web/.vite/
+django-backend/venv/
+django-backend/.venv/
