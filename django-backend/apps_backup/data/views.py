@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-class MonitoringView(APIView):
+class HistoricalDataView(APIView):
     def get(self, request):
-        # Return mock monitoring data
-        return Response({"stations": []})
+        # Return mock historical data
+        return Response({"data": []})
